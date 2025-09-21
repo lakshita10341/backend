@@ -2,4 +2,5 @@
 python manage.py migrate --noinput
 python manage.py seed_event --noinput
 python manage.py collectstatic --noinput
-exec "$@"
+exec gunicorn web_analytics_backend.wsgi:application --bind 0.0.0.0:$PORT
+

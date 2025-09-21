@@ -23,4 +23,5 @@ EXPOSE 8000
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-CMD ["gunicorn", "web_analytics_backend.wsgi:application", "--bind", "0.0.0.0:$PORT"]
+CMD gunicorn web_analytics_backend.wsgi:application --bind 0.0.0.0:$PORT
+
