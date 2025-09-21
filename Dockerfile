@@ -1,7 +1,6 @@
 # backend/Dockerfile
 FROM python:3.11-slim
 
-# Set workdir
 WORKDIR /app
 
 # Install system dependencies
@@ -13,14 +12,15 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+# Copy project files
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
+# Entrypoint script handles collectstatic + migrate
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-# Expose Django port
 EXPOSE 8000
 
-# Run gunicorn 
-CMD ["gunicorn", "web_analytics_backend.wsgi:application", "--bind", "0.0.0.0:8000"]
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+CMD ["gunicorn", "web_analytics_backend.wsgi:application", "--bind", "0.0.0.0:$PORT"]
