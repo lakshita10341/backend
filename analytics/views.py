@@ -173,11 +173,9 @@ def sessions_metrics(request, site_id):
     if not site:
         return Response({"error": "not allowed"}, status=403)
 
-    # reasonable sessionization: events grouped by session_id
-    # For each session_id compute start and end times and duration.
-    from django.db.models import Min, Max
     since = timezone.now() - timedelta(days=int(request.query_params.get("days", 30)))
 
+    # Count unique sessions
     sessions = (
         Event.objects.filter(site=site, timestamp__gte=since)
         .values("session_id")
@@ -196,13 +194,14 @@ def sessions_metrics(request, site_id):
     session_count = len(session_list)
     avg_duration = total_duration_seconds / session_count if session_count else 0
 
-    # trend by day: number of sessions per day (use start date)
-    from django.db.models.functions import TruncDate
+    # Correct trend: unique sessions per day (by session start date)
     session_starts = (
         Event.objects.filter(site=site, timestamp__gte=since)
         .values("session_id")
         .annotate(start=Min("timestamp"))
         .annotate(day=TruncDate("start"))
+        .values("day", "session_id")
+        .distinct()
         .values("day")
         .annotate(sessions=Count("session_id"))
         .order_by("day")
