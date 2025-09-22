@@ -202,11 +202,12 @@ def sessions_metrics(request, site_id):
         .annotate(day=TruncDate("start"))
         .values("day", "session_id")
         .distinct()
-        .values("day")
-        .annotate(sessions=Count("session_id"))
-        .order_by("day")
     )
-    trend = [{"date": r["day"], "sessions": r["sessions"]} for r in session_starts]
+    trend_dict = {}
+    for row in session_starts:
+        day = row["day"]
+        trend_dict[day] = trend_dict.get(day, 0) + 1
+    trend = [{"date": day, "sessions": count} for day, count in sorted(trend_dict.items())]
 
     return Response({"session_count": session_count, "avg_duration_seconds": avg_duration, "trend": trend})
 
