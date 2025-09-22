@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Count, Avg, Min, Max, Q
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 from datetime import timedelta
 from .models import Event, Site
@@ -140,7 +141,6 @@ def page_views(request, site_id):
     if not site:
         return Response({"error": "not allowed"}, status=403)
 
-    from django.db.models.functions import TruncDate
     last_n_days = request.query_params.get("days", 30)
     try:
         last_n_days = int(last_n_days)
