@@ -503,7 +503,7 @@ def kpis(request, site_id):
 
         res["compare"] = {"start": prev_start, "end": prev_end}
         res["deltas"] = {
-             "page_views_pct": pct(page_views_cnt, prev_page_views),
+            "page_views_pct": pct(page_views_cnt, prev_page_views),
             "sessions_pct": pct(sessions, prev_sessions),
             "users_pct": pct(users, prev_users),
         }
